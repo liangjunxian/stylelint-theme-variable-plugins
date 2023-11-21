@@ -1,0 +1,20 @@
+{
+  "name": "theme-variable-plugins",
+  "version": "0.0.1",
+  "description": "样式变量使用校验",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "liang.junxian",
+  "license": "MIT",
+  "dependencies": {
+    "eslint": "^8.54.0",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-react": "^7.33.2",
+    "postcss": "^8.4.31",
+    "stylelint": "^15.11.0"
+  }
+}
