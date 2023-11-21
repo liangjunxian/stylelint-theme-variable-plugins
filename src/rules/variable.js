@@ -16,20 +16,6 @@ const messages = stylelint.utils.ruleMessages(ruleName, {
  * space-properties-check: 间距属性检查, "off" / "on"
  */
 
-const eachMessage = (values) => {
-  if (values.length > 0) {
-    const msg = stylelint.utils.ruleMessages(ruleName, {
-      messages: `${ruleMessages.message}${values.map((item) => `${item}: ${theme[item]}\n`).join('')}`,
-    });
-    stylelint.utils.report({
-      message: msg.messages,
-      node: decl,
-      result,
-      ruleName,
-    });
-  }
-}
-
 const plugin = postcss.plugin(ruleName, (options = {
   theme: null,
   'color-properties-check': 'on',
@@ -61,7 +47,17 @@ const plugin = postcss.plugin(ruleName, (options = {
           const values = Object.keys(theme).filter(
             (item) => (theme[item] === propertyValue) || propertyValue.includes(theme[item]),
           );
-          eachMessage(values);
+          if (values.length > 0) {
+            const msg = stylelint.utils.ruleMessages(ruleName, {
+              messages: `${ruleMessages.message}${values.map((item) => `${item}: ${theme[item]}\n`).join('')}`,
+            });
+            stylelint.utils.report({
+              message: msg.messages,
+              node: decl,
+              result,
+              ruleName,
+            });
+          }
         }
       }
       // 检查尺寸值的使用
@@ -83,7 +79,17 @@ const plugin = postcss.plugin(ruleName, (options = {
           const values = Object.keys(theme).filter(
             (item) => item.includes(propertyName) && (theme[item] === propertyValue) || propertyValue.includes(theme[item]),
           );
-          eachMessage(values);
+          if (values.length > 0) {
+            const msg = stylelint.utils.ruleMessages(ruleName, {
+              messages: `${ruleMessages.message}${values.map((item) => `${item}: ${theme[item]}\n`).join('')}`,
+            });
+            stylelint.utils.report({
+              message: msg.messages,
+              node: decl,
+              result,
+              ruleName,
+            });
+          }
         }
       }
       if (options['space-properties-check'] === 'on') { 
@@ -103,7 +109,17 @@ const plugin = postcss.plugin(ruleName, (options = {
           const values = Object.keys(theme).filter(
             (item) => (theme[item] === propertyValue) || propertyValue.includes(theme[item]),
           );
-          eachMessage(values);
+          if (values.length > 0) {
+            const msg = stylelint.utils.ruleMessages(ruleName, {
+              messages: `${ruleMessages.message}${values.map((item) => `${item}: ${theme[item]}\n`).join('')}`,
+            });
+            stylelint.utils.report({
+              message: msg.messages,
+              node: decl,
+              result,
+              ruleName,
+            });
+          }
         }
       }
     }
