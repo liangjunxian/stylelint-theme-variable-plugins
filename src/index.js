@@ -1,7 +1,7 @@
-const colorVariable = require('./rules/color-variable');
+const variable = require('./rules/variable');
 
 const rulesObj = {
-  'color-variable': colorVariable,
+  'variable': variable,
 };
 
 module.exports = rulesObj;

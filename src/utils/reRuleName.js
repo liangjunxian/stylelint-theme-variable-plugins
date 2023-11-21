@@ -1,5 +1,5 @@
 const reRuleName = (name) => {
-  const prefix = 'theme-check';
+  const prefix = 'stylelint-theme-check';
   if (name && typeof name === 'string') {
     return `${prefix}/${name}`;
   }
