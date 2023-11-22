@@ -1,3 +1,3 @@
-const propsVariableCheck = require('./rules/props-variable-check');
+const propsVariableUse = require('./rules/props-variable-use');
 
-module.exports = propsVariableCheck;
+module.exports = propsVariableUse;

@@ -3,7 +3,7 @@ const stylelint = require('stylelint');
 const reRuleName = require('../utils/reRuleName');
 const ruleMessages = require('../utils/ruleMessage');
 
-const ruleName = reRuleName('props-variable-check');
+const ruleName = reRuleName('props-variable-use');
 
 const messages = stylelint.utils.ruleMessages(ruleName, {
   expected: ruleMessages.expected,
@@ -16,12 +16,7 @@ const messages = stylelint.utils.ruleMessages(ruleName, {
  * space-props-check: 间距属性检查, "off" / "on"
  */
 
-const plugin = postcss.plugin(ruleName, (options = {
-  theme: null,
-  'color-props-check': 'on',
-  'size-props-check': 'on',
-  'space-props-check': 'on',
-}) => (root, result) => {
+const plugin = postcss.plugin(ruleName, (options) => (root, result) => {
   const { theme } = options;
   if (!theme) {
     return;
@@ -32,7 +27,7 @@ const plugin = postcss.plugin(ruleName, (options = {
     const propertyValue = decl.value ? decl.value.toLowerCase() : '';
     if (propertyName && propertyValue) {
       // 检查颜色的使用
-      if (options['color-props-check'] === 'on') {
+      if (options['color-props-check'] !== 'off') {
         const colorAttr = [
           'background',
           'background-color',
@@ -61,7 +56,7 @@ const plugin = postcss.plugin(ruleName, (options = {
         }
       }
       // 检查尺寸值的使用
-      if (options['size-props-check'] === 'on') {
+      if (options['size-props-check'] !== 'off') {
         const sizeAttr = [
           'font',
           'font-size',
@@ -93,7 +88,7 @@ const plugin = postcss.plugin(ruleName, (options = {
           }
         }
       }
-      if (options['space-props-check'] === 'on') {
+      if (options['space-props-check'] !== 'off') {
         const spaceAttr = [
           'margin',
           'margin-top',
