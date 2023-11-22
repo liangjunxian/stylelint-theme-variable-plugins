@@ -13,14 +13,14 @@ const messages = stylelint.utils.ruleMessages(ruleName, {
 const eachMessage = (values, options = {}) => {
   if (values.length > 0) {
     const msg = stylelint.utils.ruleMessages(ruleName, {
-      messages: `${ruleMessages.message}${values.map((item) => `${item}: ${theme[item]}\n`).join('')}`,
+      messages: `${ruleMessages.message}${values.map((item) => `${item}: ${options.theme[item]}\n`).join('')}`,
     });
     stylelint.utils.report({
       message: msg.messages,
       node: options.node,
       result: options.result,
       ruleName,
-      severity: ['error', 'warning', 'ignore'].includes(options.result) ? options.result : 'warning',
+      severity: ['error', 'warning', 'ignore'].includes(options.severity) ? options.severity : 'warning',
     });
   }
 }
@@ -63,6 +63,7 @@ const plugin = postcss.plugin(ruleName, (options) => (root, result) => {
             node: decl,
             result,
             severity,
+            theme,
           });
         }
       }
@@ -83,13 +84,15 @@ const plugin = postcss.plugin(ruleName, (options) => (root, result) => {
         ];
         if (sizeAttr.includes(propertyName)) {
           const values = Object.keys(theme).filter(
-            (item) => item.includes(propertyName)
-              && ((theme[item] === propertyValue) || propertyValue.includes(theme[item])),
+            (item) => item.includes(propertyName) 
+              && !(item.includes('margin') || item.includes('padding') || item.includes('space'))
+              && (theme[item] === propertyValue),
           );
           eachMessage(values, {
             node: decl,
             result,
             severity,
+            theme,
           });
         }
       }
@@ -108,13 +111,14 @@ const plugin = postcss.plugin(ruleName, (options) => (root, result) => {
         ];
         if (spaceAttr.includes(propertyName)) {
           const values = Object.keys(theme).filter(
-            (item) => ['padding', 'margin', 'space'].includes(item) 
-              && ((theme[item] === propertyValue) || propertyValue.includes(theme[item])),
+            (item) => (item.includes('margin') || item.includes('padding') || item.includes('space'))
+              && (theme[item] === propertyValue),
           );
           eachMessage(values, {
             node: decl,
             result,
             severity,
+            theme,
           });
         }
       }
