@@ -3,7 +3,7 @@ const stylelint = require('stylelint');
 const reRuleName = require('../utils/reRuleName');
 const ruleMessages = require('../utils/ruleMessage');
 
-const ruleName = reRuleName('properties-variable-check');
+const ruleName = reRuleName('props-variable-check');
 
 const messages = stylelint.utils.ruleMessages(ruleName, {
   expected: ruleMessages.expected,
@@ -11,16 +11,16 @@ const messages = stylelint.utils.ruleMessages(ruleName, {
 
 /**
  * theme: 变量对象
- * color-properties-check: 颜色属性检查, "off" / "on"
- * size-properties-check: 尺寸属性检查, "off" / "on"
- * space-properties-check: 间距属性检查, "off" / "on"
+ * color-props-check: 颜色属性检查, "off" / "on"
+ * size-props-check: 尺寸属性检查, "off" / "on"
+ * space-props-check: 间距属性检查, "off" / "on"
  */
 
 const plugin = postcss.plugin(ruleName, (options = {
   theme: null,
-  'color-properties-check': 'on',
-  'size-properties-check': 'on',
-  'space-properties-check': 'on',
+  'color-props-check': 'on',
+  'size-props-check': 'on',
+  'space-props-check': 'on',
 }) => (root, result) => {
   const { theme } = options;
   if (!theme) {
@@ -32,7 +32,7 @@ const plugin = postcss.plugin(ruleName, (options = {
     const propertyValue = decl.value ? decl.value.toLowerCase() : '';
     if (propertyName && propertyValue) {
       // 检查颜色的使用
-      if (options['color-properties-check'] === 'on') {
+      if (options['color-props-check'] === 'on') {
         const colorAttr = [
           'background',
           'background-color',
@@ -61,7 +61,7 @@ const plugin = postcss.plugin(ruleName, (options = {
         }
       }
       // 检查尺寸值的使用
-      if (options['size-properties-check'] === 'on') {
+      if (options['size-props-check'] === 'on') {
         const sizeAttr = [
           'font',
           'font-size',
@@ -93,7 +93,7 @@ const plugin = postcss.plugin(ruleName, (options = {
           }
         }
       }
-      if (options['space-properties-check'] === 'on') {
+      if (options['space-props-check'] === 'on') {
         const spaceAttr = [
           'margin',
           'margin-top',
