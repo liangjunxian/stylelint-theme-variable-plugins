@@ -1,3 +1,3 @@
-const propertiesVariableCheck = require('./rules/properties-variable-check');
+const propsVariableCheck = require('./rules/props-variable-check');
 
-module.exports = propertiesVariableCheck;
+module.exports = propsVariableCheck;
