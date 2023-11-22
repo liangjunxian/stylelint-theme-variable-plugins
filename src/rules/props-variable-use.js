@@ -2,12 +2,28 @@ const postcss = require('postcss');
 const stylelint = require('stylelint');
 const reRuleName = require('../utils/reRuleName');
 const ruleMessages = require('../utils/ruleMessage');
+const isColor = require('../utils/isColor');
 
 const ruleName = reRuleName('props-variable-use');
 
 const messages = stylelint.utils.ruleMessages(ruleName, {
   expected: ruleMessages.expected,
 });
+
+const eachMessage = (values, options = {}) => {
+  if (values.length > 0) {
+    const msg = stylelint.utils.ruleMessages(ruleName, {
+      messages: `${ruleMessages.message}${values.map((item) => `${item}: ${theme[item]}\n`).join('')}`,
+    });
+    stylelint.utils.report({
+      message: msg.messages,
+      node: options.node,
+      result: options.result,
+      ruleName,
+      severity: ['error', 'warning', 'ignore'].includes(options.result) ? options.result : 'warning',
+    });
+  }
+}
 
 /**
  * theme: 变量对象
@@ -17,7 +33,7 @@ const messages = stylelint.utils.ruleMessages(ruleName, {
  */
 
 const plugin = postcss.plugin(ruleName, (options) => (root, result) => {
-  const { theme } = options;
+  const { theme, severity } = options;
   if (!theme) {
     return;
   }
@@ -40,19 +56,14 @@ const plugin = postcss.plugin(ruleName, (options) => (root, result) => {
         ];
         if (colorAttr.includes(propertyName)) {
           const values = Object.keys(theme).filter(
-            (item) => (theme[item] === propertyValue) || propertyValue.includes(theme[item]),
+            (item) => isColor(theme[item]) 
+              && ((theme[item] === propertyValue) || propertyValue.includes(theme[item])),
           );
-          if (values.length > 0) {
-            const msg = stylelint.utils.ruleMessages(ruleName, {
-              messages: `${ruleMessages.message}${values.map((item) => `${item}: ${theme[item]}\n`).join('')}`,
-            });
-            stylelint.utils.report({
-              message: msg.messages,
-              node: decl,
-              result,
-              ruleName,
-            });
-          }
+          eachMessage(values, {
+            node: decl,
+            result,
+            severity,
+          });
         }
       }
       // 检查尺寸值的使用
@@ -73,19 +84,13 @@ const plugin = postcss.plugin(ruleName, (options) => (root, result) => {
         if (sizeAttr.includes(propertyName)) {
           const values = Object.keys(theme).filter(
             (item) => item.includes(propertyName)
-            && ((theme[item] === propertyValue) || propertyValue.includes(theme[item])),
+              && ((theme[item] === propertyValue) || propertyValue.includes(theme[item])),
           );
-          if (values.length > 0) {
-            const msg = stylelint.utils.ruleMessages(ruleName, {
-              messages: `${ruleMessages.message}${values.map((item) => `${item}: ${theme[item]}\n`).join('')}`,
-            });
-            stylelint.utils.report({
-              message: msg.messages,
-              node: decl,
-              result,
-              ruleName,
-            });
-          }
+          eachMessage(values, {
+            node: decl,
+            result,
+            severity,
+          });
         }
       }
       if (options['space-props-check'] !== 'off') {
@@ -103,19 +108,14 @@ const plugin = postcss.plugin(ruleName, (options) => (root, result) => {
         ];
         if (spaceAttr.includes(propertyName)) {
           const values = Object.keys(theme).filter(
-            (item) => (theme[item] === propertyValue) || propertyValue.includes(theme[item]),
+            (item) => ['padding', 'margin', 'space'].includes(item) 
+              && ((theme[item] === propertyValue) || propertyValue.includes(theme[item])),
           );
-          if (values.length > 0) {
-            const msg = stylelint.utils.ruleMessages(ruleName, {
-              messages: `${ruleMessages.message}${values.map((item) => `${item}: ${theme[item]}\n`).join('')}`,
-            });
-            stylelint.utils.report({
-              message: msg.messages,
-              node: decl,
-              result,
-              ruleName,
-            });
-          }
+          eachMessage(values, {
+            node: decl,
+            result,
+            severity,
+          });
         }
       }
     }
