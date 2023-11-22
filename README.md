@@ -8,7 +8,7 @@ const theme = require('./src/assets/theme/default.json');
 
 module.exports = {
   /** 其他代码... */
-  "plugins": ["theme-variable-plugins"],
+  "plugins": ["stylelint-theme-variable-plugins"],
   "rules": {
     "stylelint-check/props-variable-use": {
       "theme": theme,
