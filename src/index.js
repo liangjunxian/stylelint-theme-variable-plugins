@@ -1,7 +1,3 @@
-const variable = require('./rules/variable');
+const propertiesVariableCheck = require('./rules/properties-variable-check');
 
-const rulesObj = {
-  'variable': variable,
-};
-
-module.exports = rulesObj;
+module.exports = propertiesVariableCheck;

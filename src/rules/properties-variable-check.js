@@ -22,15 +22,15 @@ const plugin = postcss.plugin(ruleName, (options = {
   'size-properties-check': 'on',
   'space-properties-check': 'on',
 }) => (root, result) => {
-  
-  if (!options.theme) {
+  const { theme } = options;
+  if (!theme) {
     return;
   }
 
   root.walkDecls((decl) => {
     const propertyName = decl.prop ? decl.prop.toLowerCase() : '';
     const propertyValue = decl.value ? decl.value.toLowerCase() : '';
-    if(propertyName && propertyValue) {
+    if (propertyName && propertyValue) {
       // 检查颜色的使用
       if (options['color-properties-check'] === 'on') {
         const colorAttr = [
@@ -77,7 +77,8 @@ const plugin = postcss.plugin(ruleName, (options = {
         ];
         if (sizeAttr.includes(propertyName)) {
           const values = Object.keys(theme).filter(
-            (item) => item.includes(propertyName) && (theme[item] === propertyValue) || propertyValue.includes(theme[item]),
+            (item) => item.includes(propertyName)
+            && ((theme[item] === propertyValue) || propertyValue.includes(theme[item])),
           );
           if (values.length > 0) {
             const msg = stylelint.utils.ruleMessages(ruleName, {
@@ -92,7 +93,7 @@ const plugin = postcss.plugin(ruleName, (options = {
           }
         }
       }
-      if (options['space-properties-check'] === 'on') { 
+      if (options['space-properties-check'] === 'on') {
         const spaceAttr = [
           'margin',
           'margin-top',
