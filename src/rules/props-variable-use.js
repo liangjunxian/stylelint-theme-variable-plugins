@@ -23,7 +23,7 @@ const eachMessage = (values, options = {}) => {
       severity: ['error', 'warning', 'ignore'].includes(options.severity) ? options.severity : 'warning',
     });
   }
-}
+};
 
 /**
  * theme: 变量对象
@@ -56,8 +56,19 @@ const plugin = postcss.plugin(ruleName, (options) => (root, result) => {
         ];
         if (colorAttr.includes(propertyName)) {
           const values = Object.keys(theme).filter(
-            (item) => isColor(theme[item]) 
-              && ((theme[item] === propertyValue) || propertyValue.includes(theme[item])),
+            (item) => {
+              let flat = isColor(theme[item]);
+              // 如果是文字,则忽略关键字含背景相关的变量
+              if (propertyName === 'color') {
+                flat = !(item.includes('fill') || item.includes('background') || item.includes('bg'));
+              }
+              // 如果是投影,则查找含投影关键字及颜色的变量
+              if (['box-shadow', 'text-shadow'].includes(propertyName)) {
+                flat = (item.includes('shadow') || isColor(theme[item]));
+              }
+              return flat
+                && ((theme[item] === propertyValue) || propertyValue.includes(theme[item]));
+            },
           );
           eachMessage(values, {
             node: decl,
@@ -84,7 +95,7 @@ const plugin = postcss.plugin(ruleName, (options) => (root, result) => {
         ];
         if (sizeAttr.includes(propertyName)) {
           const values = Object.keys(theme).filter(
-            (item) => item.includes(propertyName) 
+            (item) => item.includes(propertyName)
               && !(item.includes('margin') || item.includes('padding') || item.includes('space'))
               && (theme[item] === propertyValue),
           );
