@@ -41,3 +41,14 @@ module.exports = {
 | size-props-check | string('off \| on')  | 是否开启尺寸属性检查 |  'on' | 否 |
 | space-props-check | string('off \| on')  | 是否开启间距属性检查 |  'on' | 否 |
 | severity | string('error' \| 'warning' \| 'ignore')  | 发现问题后的状态 |  'warning' | 否 |
+
+
+# 使用命令行检测单个文件
+## 1. 全局安装styelint
+```
+npm i stylelint -g
+```
+## 2. 执行命令
+```
+stylelint path/to/your.less --formatter unix
+```
