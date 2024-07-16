@@ -37,37 +37,98 @@ const plugin = postcss.plugin(ruleName, (options) => (root, result) => {
   if (!theme) {
     return;
   }
+  const colorAttr = [
+    'background',
+    'background-color',
+    'border-color',
+    'color',
+    'outline-color',
+    'border',
+    'box-shadow',
+    'text-shadow',
+  ];
+  const sizeAttr = [
+    'font',
+    'font-size',
+    'line-height',
+    'border-radius',
+    'height',
+    'width',
+    'min-width',
+    'max-width',
+    'min-height',
+    'max-height',
+    'font-weight',
+  ];
+  const spaceAttr = [
+    'margin',
+    'margin-top',
+    'margin-bottom',
+    'margin-left',
+    'margin-right',
+    'padding',
+    'padding-top',
+    'padding-bottom',
+    'padding-left',
+    'padding-right',
+    'gap',
+    'grid-gap',
+    'grid-row-gap',
+    'grid-column-gap'
+  ];
+  let colorVars = {};
+  let spaceVars = {};
+  let sizeVars = {};
+
+  Object.keys(theme).forEach(varName => {
+    if (varName.includes('media')) {
+      return;
+    }
+    if (
+      varName.includes('margin') || 
+      varName.includes('padding') || 
+      varName.includes('space')
+    ) {
+      spaceVars[varName] = theme[varName];
+    } else if (
+      (
+      varName.includes('width') ||
+      varName.includes('height') ||
+      varName.includes('size') || 
+      varName.includes('font') ||
+      varName.includes('radius')
+    )
+  ) {
+      sizeVars[varName] = theme[varName];
+    } else {
+      colorVars[varName] = theme[varName];
+    }
+  })
 
   root.walkDecls((decl) => {
     const propertyName = decl.prop ? decl.prop.toLowerCase() : '';
     const propertyValue = decl.value ? decl.value.toLowerCase() : '';
-    if (propertyName && propertyValue) {
+    if (propertyName && propertyValue && !['@', '$'].includes(propertyValue.slice(0, 1))) {
       // 检查颜色的使用
       if (options['color-props-check'] !== 'off') {
-        const colorAttr = [
-          'background',
-          'background-color',
-          'border-color',
-          'color',
-          'outline-color',
-          'border',
-          'box-shadow',
-          'text-shadow',
-        ];
         if (colorAttr.includes(propertyName)) {
-          const values = Object.keys(theme).filter(
+          const values = Object.keys(colorVars).filter(
             (item) => {
-              let flat = isColor(theme[item]);
+              let flat = isColor(colorVars[item]);
+              const isValueMatch = (colorVars[item] === propertyValue) || propertyValue.includes(colorVars[item]);
               // 如果是文字,则忽略关键字含背景相关的变量
               if (propertyName === 'color') {
                 flat = !(item.includes('fill') || item.includes('background') || item.includes('bg'));
               }
+              // 如果是背景,则忽略文字相关变量
+              if (propertyName.includes('background')) {
+                flat = !(item.includes('text') || item.includes('font') || item.includes('link'));
+              }
               // 如果是投影,则查找含投影关键字及颜色的变量
               if (['box-shadow', 'text-shadow'].includes(propertyName)) {
-                flat = (item.includes('shadow') || isColor(theme[item]));
+                flat = (item.includes('shadow') || isColor(colorVars[item]));
               }
-              return flat
-                && ((theme[item] === propertyValue) || propertyValue.includes(theme[item]));
+              return flat && isValueMatch;
             },
           );
           eachMessage(values, {
@@ -80,24 +141,20 @@ const plugin = postcss.plugin(ruleName, (options) => (root, result) => {
       }
       // 检查尺寸值的使用
       if (options['size-props-check'] !== 'off') {
-        const sizeAttr = [
-          'font',
-          'font-size',
-          'line-height',
-          'border-radius',
-          'height',
-          'width',
-          'min-width',
-          'max-width',
-          'min-height',
-          'max-height',
-          'font-weight',
-        ];
         if (sizeAttr.includes(propertyName)) {
-          const values = Object.keys(theme).filter(
-            (item) => item.includes(propertyName)
-              && !(item.includes('margin') || item.includes('padding') || item.includes('space'))
-              && (theme[item] === propertyValue),
+          const values = Object.keys(sizeVars).filter(
+            (item) => {
+              const isFontSize = item.includes('font') || item.includes('article') || item.includes('heading');
+              const isLineHeight = item.includes('line-height');
+              const isValueMatch = sizeVars[item] === propertyValue;
+              if (propertyName.includes('font')) {
+                return item.includes(propertyName) && isFontSize && isValueMatch;
+              }
+              if (propertyName.includes('line-height')) {
+                return item.includes(propertyName) && isLineHeight && isValueMatch;
+              }
+              return (item.includes(propertyName) || item.includes('size')) && !isFontSize && !isLineHeight && isValueMatch
+            },
           );
           eachMessage(values, {
             node: decl,
@@ -108,22 +165,9 @@ const plugin = postcss.plugin(ruleName, (options) => (root, result) => {
         }
       }
       if (options['space-props-check'] !== 'off') {
-        const spaceAttr = [
-          'margin',
-          'margin-top',
-          'margin-bottom',
-          'margin-left',
-          'margin-right',
-          'padding',
-          'padding-top',
-          'padding-bottom',
-          'padding-left',
-          'padding-right',
-        ];
         if (spaceAttr.includes(propertyName)) {
-          const values = Object.keys(theme).filter(
-            (item) => (item.includes('margin') || item.includes('padding') || item.includes('space'))
-              && (theme[item] === propertyValue),
+          const values = Object.keys(spaceVars).filter(
+            (item) => propertyValue.split(' ').includes(spaceVars[item]),
           );
           eachMessage(values, {
             node: decl,
